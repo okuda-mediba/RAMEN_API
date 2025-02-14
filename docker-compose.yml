@@ -1,0 +1,46 @@
+# version: "3.8"
+services:
+    go:
+        container_name: ramen_go
+        build: ./golang
+        tty: true
+        ports:
+            - 8080:8080
+        env_file:
+            - ./mysql/.env
+        depends_on:
+            db:
+              condition: service_healthy
+        volumes:
+            - ./golang/app:/go/src/app
+        networks:
+            - golang_test_network
+
+    db:
+        container_name: ramen_db
+        build: ./mysql
+        tty: true
+        platform: linux/x86_64
+        ports:
+            - 3306:3306
+        env_file:
+            - ./mysql/.env
+        volumes:
+            - mysql_test_volume:/var/lib/mysql
+        networks:
+            - golang_test_network
+        healthcheck:
+        # データベースの立ち上げに時間がかかる調整
+          test: [ "CMD", "mysqladmin", "ping", "-h", "localhost"]
+          interval: 10s
+          retries: 5
+          timeout: 5s
+
+volumes:
+    mysql_test_volume:
+        name: mysql_test_volume
+
+networks:
+    golang_test_network:
+        external: true
+
