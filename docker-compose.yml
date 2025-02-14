@@ -9,7 +9,8 @@ services:
         env_file:
             - ./mysql/.env
         depends_on:
-            - db
+            db:
+              condition: service_healthy
         volumes:
             - ./golang/app:/go/src/app
         networks:
@@ -28,6 +29,12 @@ services:
             - mysql_test_volume:/var/lib/mysql
         networks:
             - golang_test_network
+        healthcheck:
+        # データベースの立ち上げに時間がかかる調整
+          test: [ "CMD", "mysqladmin", "ping", "-h", "localhost"]
+          interval: 10s
+          retries: 5
+          timeout: 5s
 
 volumes:
     mysql_test_volume:
