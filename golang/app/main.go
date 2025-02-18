@@ -3,24 +3,24 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
+	// "os"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
 // MySQLに作成するUserテーブルの定義
-type User struct {
-	// gorm.Modelをつけると、idとCreatedAtとUpdatedAtとDeletedAtが作られる
-	gorm.Model
+// type User struct {
+// 	// gorm.Modelをつけると、idとCreatedAtとUpdatedAtとDeletedAtが作られる
+// 	gorm.Model
 
-	Name string
-	Age  int
-}
+// 	Name string
+// 	Age  int
+// }
 
 // DBを起動させる
 func dbInit() *gorm.DB {
-	// [ユーザ名]:[パスワード]@tcp([ホスト名]:[ポート番号])/[データベース名]?charset=[文字コード]
+	//[ユーザ名]:[パスワード]@tcp([ホスト名]:[ポート番号])/[データベース名]?charset=[文字コード]
 	dsn := fmt.Sprintf(`%s:%s@tcp(db:3306)/%s?charset=utf8mb4&parseTime=True`, 
             os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_DATABASE"))
 	// DBへの接続を行う
@@ -39,6 +39,6 @@ func main() {
 	// DB起動
 	db := dbInit()
 	// Userテーブル作成
-	db.AutoMigrate(&User{})
+	// db.AutoMigrate(&User{})
 }
 
