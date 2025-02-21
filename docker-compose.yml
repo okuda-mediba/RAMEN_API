@@ -19,16 +19,18 @@ services:
     db:
         container_name: ramen_db
         environment:
-          MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-          MYSQL_DATABASE: ${MYSQL_DATABASE}
-          MYSQL_USER: ${MYSQL_USER}
-          MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            POSTGRES_HOST_AUTH_METHOD: 'trust'
+            POSTGRES_PASSWORD: 'postgres'
 
         build: ./mysql
         tty: true
         platform: linux/x86_64
         ports:
-            - 3306:3306
+            - 127.0.0.1:3306
         env_file:
             - .env
         volumes:

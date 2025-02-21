@@ -19,5 +19,3 @@ INSERT INTO users (store, menu, address, station, taste_id, price, evaluation) V
 -- INSERT INTO user values (id, 'お店', 'メニュー', '住所', '駅', '味の種類', '価格', '評価', '現在時刻', 'メニュー');
 --  (store, menu, address, station, taste_id, price, evaluation)
 -- ("", "", "", "", , , )
---  (1, '野方ホープ 目黒店', 'のがほ　元', '住所	
--- 東京都目黒区目黒1-5-16 ABC MEGURO 1F', '目黒駅', '東京豚骨', '750', '4.5');
