@@ -14,8 +14,7 @@ CREATE TABLE `testDB`.`users`(
   PRIMARY KEY (`ramen_id`)
 );
 
-INSERT INTO users (store, menu, address, station, taste_id, price, evaluation) VALUES ('野方ホープ  目黒店', '元', '	
-東京都目黒区目黒1-5-16 ABC MEGURO 1F', '目黒駅', 3, 750, 9999);
+INSERT INTO users (store, menu, address, station, taste_id, price, evaluation) VALUES ('野方ホープ  目黒店', '元', '東京都目黒区目黒1-5-16 ABC MEGURO 1F', '目黒駅', 3, 750, 9999);
 -- INSERT INTO user values (id, 'お店', 'メニュー', '住所', '駅', '味の種類', '価格', '評価', '現在時刻', 'メニュー');
 --  (store, menu, address, station, taste_id, price, evaluation)
 -- ("", "", "", "", , , )

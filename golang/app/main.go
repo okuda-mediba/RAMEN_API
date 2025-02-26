@@ -1,74 +1,107 @@
 package main
 
 import (
-	"fmt"
+	"database/sql"
 	"log"
-	//"os"
 
 	"github.com/gin-gonic/gin"
-	"database/sql"
-	//"gorm.io/gorm"
-	//"gorm.io/driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
+var db *sql.DB
 
-func main() {
-
+func dbConnect() {
+	var err error
 	// DBへの接続を行う
-	db, err := sql.Open("mysql", "test_user:password@tcp(127.0.0.1:3306)/testDB")
-	// db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})`
-	// エラーが発生した場合、エラー内容を表示
+	db, err = sql.Open("mysql", "test_user:password@tcp(127.0.0.1:8000)/testDB?charset=utf8mb4")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	defer db.Close()
-	// 接続に成功した場合、「db connected!!」と表示する
-	fmt.Println("db connected!!")
 	err = db.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println("データベース接続成功")
+}
 
+// バイト列をUTF-8文字列に変換する関数
+func bytesToString(b []byte) string {
+	return string(b)
+}
 
-	// Ginエンジンのインスタンスを作成
+// usersテーブルのデータを取得する関数
+func getRows() ([]map[string]interface{}, error) {
+	rows, err := db.Query("SELECT * FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []map[string]interface{}
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		columnValues := make([]interface{}, len(columns))
+		columnPointers := make([]interface{}, len(columns))
+		for i := range columnValues {
+			columnPointers[i] = &columnValues[i]
+		}
+
+		if err := rows.Scan(columnPointers...); err != nil {
+			return nil, err
+		}
+
+		result := make(map[string]interface{})
+		for i, colName := range columns {
+			value := columnValues[i] // valueを設定
+			// バイト列の場合、UTF-8に変換
+			if bytesValue, ok := value.([]byte); ok {
+				result[colName] = bytesToString(bytesValue) // 変換処理
+			}
+		}
+
+		results = append(results, result)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
+}
+
+func main() {
+	dbConnect()
 	r := gin.Default()
 
 	// ルートURL ("/") に対するGETリクエストをハンドル
 	r.GET("/", func(c *gin.Context) {
-		// JSONレスポンスを返す
 		c.JSON(200, gin.H{
-		"message": "Hello World",
+			"message": "Hello World",
 		})
 	})
 
-	// 8080ポートでサーバーを起動
-	r.Run(":8000")
+	// usersテーブルのデータを取得するGETエンドポイント
+	r.GET("/getUsers", func(c *gin.Context) {
+		results, err := getRows()
+		if err != nil {
+			c.JSON(500, gin.H{"error": err.Error()})
+			return
+		}
+
+		log.Printf("取得したデータ: %+v", results)
+		c.Header("Content-Type", "application/json; charset=utf-8")
+		c.JSON(200, gin.H{
+			"data": results,
+		})
+	})
+
+	// 8000ポートでサーバーを起動
+	r.Run(":8010")
 }
-
-
-// DBを起動させる
-// func dbInit() *gorm.DB {
-// 	// [ユーザ名]:[パスワード]@tcp([ホスト名]:[ポート番号])/[データベース名]?charset=[文字コード]
-// 	dsn := fmt.Sprintf(`%s:%s@tcp(db:3306)/%s?charset=utf8mb4&parseTime=True`, 
-//             os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_DATABASE"))
-// 	// DBへの接続を行う
-// 	db, err := sql.Open("mysql",dsn)
-// 	// db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-
-// 	// エラーが発生した場合、エラー内容を表示
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	// 接続に成功した場合、「db connected!!」と表示する
-// 	fmt.Println("db connected!!")
-// 	err = db.Ping()
-//     if err != nil {
-//         log.Fatal(err)
-//     }
-
-// 	return db
-// }

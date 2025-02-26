@@ -16,6 +16,7 @@ services:
         networks:
             - golang_test_network
 
+
     db:
         container_name: ramen_db
         environment:
@@ -23,14 +24,12 @@ services:
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            POSTGRES_HOST_AUTH_METHOD: 'trust'
-            POSTGRES_PASSWORD: 'postgres'
 
         build: ./mysql
         tty: true
         platform: linux/x86_64
         ports:
-            - 127.0.0.1:3306
+            - 8000:3306
         env_file:
             - .env
         volumes:
